@@ -4,8 +4,45 @@ server:
 spring:
   application:
     name: api-gateway-service
+
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
+
+      routes:
+
+        # ============================
+        # TRANSPORT SERVICE
+        # ============================
+        - id: transport-drivers
+          uri: lb://transport-service
+          predicates:
+            - Path=/transport/drivers/**
+          filters:
+            - StripPrefix=1
+
+        - id: transport-vehicles
+          uri: lb://transport-service
+          predicates:
+            - Path=/transport/vehicles/**
+          filters:
+            - StripPrefix=1
+
+        # ============================
+        # FLEET SERVICE
+        # ============================
+        - id: fleet-missions
+          uri: lb://fleet-service
+          predicates:
+            - Path=/fleet/missions/**
+          filters:
+            - StripPrefix=1
+            - PrefixPath=/api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
